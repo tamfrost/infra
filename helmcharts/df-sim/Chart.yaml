@@ -2,5 +2,5 @@ apiVersion: v2
 name: df-sim
 description: A Helm chart for df-sim antenna API
 type: application
-version: 1.0.1
-appVersion: "1.0.1"
+version: 1.0.2
+appVersion: "1.0.2"
