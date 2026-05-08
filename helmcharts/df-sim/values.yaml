@@ -4,7 +4,7 @@ image:
   registry: ghcr.io
   repository: tamfrost/df-sim
   pullPolicy: IfNotPresent
-  tag: "ac3d9da"
+  tag: "1583374"
 
 # GitHub Container Registry authentication
 # Set githubToken to automatically create imagePullSecret
