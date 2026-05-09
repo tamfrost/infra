@@ -42,6 +42,29 @@ export GITHUB_TOKEN=$(grep CONTAINER_REGISTRY_PAT ../.env | cut -d'=' -f2)
 helm install df-sim . --set githubToken=$GITHUB_TOKEN --namespace default
 ```
 
+## Configuration
+
+### HTTPS/TLS
+
+The chart is configured with HTTPS enabled by default using OpenShift edge termination. The cluster will automatically provision and manage certificates.
+
+To customize the hostname:
+
+```bash
+helm install df-sim . \
+  --set ingress.hosts[0].host=your-domain.com \
+  --set ingress.tls[0].hosts[0]=your-domain.com \
+  --namespace default
+```
+
+### Disable HTTPS
+
+To disable HTTPS and use HTTP only:
+
+```bash
+helm install df-sim . --set ingress.enabled=false --namespace default
+```
+
 ## Upgrading
 
 Upgrade an existing release:
