@@ -44,16 +44,32 @@ helm install df-sim . --set githubToken=$GITHUB_TOKEN --namespace default
 
 ## Configuration
 
-### HTTPS/TLS
+### HTTPS/TLS (OpenShift)
 
-The chart is configured with HTTPS enabled by default using OpenShift edge termination. The cluster will automatically provision and manage certificates.
+The chart uses OpenShift Routes with edge TLS termination enabled by default. OpenShift automatically provisions and manages certificates.
+
+**Default configuration:**
+- HTTPS enabled with edge termination
+- HTTP automatically redirects to HTTPS
+- Auto-generated hostname: `df-sim-<namespace>.apps-crc.testing`
 
 To customize the hostname:
 
 ```bash
+helm upgrade df-sim . \
+  --set route.host=your-custom-domain.com \
+  --namespace default
+```
+
+### HTTPS/TLS (Standard Kubernetes)
+
+For non-OpenShift clusters, disable the route and enable ingress:
+
+```bash
 helm install df-sim . \
-  --set ingress.hosts[0].host=your-domain.com \
-  --set ingress.tls[0].hosts[0]=your-domain.com \
+  --set route.enabled=false \
+  --set ingress.enabled=true \
+  --set ingress.className=nginx \
   --namespace default
 ```
 
@@ -62,7 +78,9 @@ helm install df-sim . \
 To disable HTTPS and use HTTP only:
 
 ```bash
-helm install df-sim . --set ingress.enabled=false --namespace default
+helm install df-sim . \
+  --set route.tls.enabled=false \
+  --namespace default
 ```
 
 ## Upgrading
