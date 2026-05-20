@@ -4,7 +4,7 @@ replicaCount: 1
 # Helm will fail if these required values are missing
 image:
   pullPolicy: IfNotPresent
-  tag: "f17d872"
+  tag: "c123ecf"
 
 # GitHub Container Registry authentication
 # Set githubToken to automatically create imagePullSecret
@@ -35,19 +35,19 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8080
+  targetPort: 8080  # Application serves HTTP, nginx handles TLS
 
 # OpenShift Route configuration (preferred for OpenShift clusters)
-# Disabled - oauth2-proxy handles routing
+# Disabled - nginx proxy handles routing and TLS
 route:
-  enabled: true
+  enabled: false
   host: "df-sim.apps-crc.testing"
   path: ""
   annotations: {}
   tls:
-    enabled: true
-    termination: edge  # edge, passthrough, or reencrypt
-    insecureEdgeTerminationPolicy: Redirect  # Redirect HTTP to HTTPS
+    enabled: false
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
 
 # Standard Kubernetes Ingress (use for non-OpenShift clusters)
 ingress:
