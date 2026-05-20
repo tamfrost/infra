@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oauth2-proxy-test-express
+  namespace: openshift-gitops
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: oauth2-proxy-test
+  source:
+    repoURL: https://oauth2-proxy.github.io/manifests
+    chart: oauth2-proxy
+    targetRevision: 7.12.6
+    helm:
+      releaseName: oauth2-proxy-test
+      values: |
+        config:
+          clientID: "oauth2-proxy"
+          clientSecret: "ZagakvF7MSlQw3e8myAluGtCynpef7Y0"
+          cookieSecret: "P6TGLDH9R7klmYdzwPzlnv6v+fVFa9xO"
+
+        extraArgs:
+          provider: oidc
+          oidc-issuer-url: https://keycloak-local.apps-crc.testing/realms/master
+          redirect-url: https://test-express-app.apps-crc.testing/oauth2/callback
+          email-domain: "*"
+          http-address: 0.0.0.0:4180
+          upstream: http://test-express.test-express.svc.cluster.local:80
+          ssl-insecure-skip-verify: true
+          skip-provider-button: true
+          flush-interval: 1s
+
+        route:
+          enabled: true
+          host: test-express-app.apps-crc.testing
+          tls:
+            enabled: true
+            termination: edge
+            insecureEdgeTerminationPolicy: Redirect
+
+        service:
+          portNumber: 4180
+
+        # OpenShift security context - let platform assign UID/GID
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: null
+          seccompProfile:
+            type: RuntimeDefault
+
+        containerSecurityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: null
+          capabilities:
+            drop:
+              - ALL
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

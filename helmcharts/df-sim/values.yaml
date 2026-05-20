@@ -38,8 +38,9 @@ service:
   targetPort: 8080
 
 # OpenShift Route configuration (preferred for OpenShift clusters)
+# NOTE: When using oauth2-proxy, keep this disabled to route traffic through the proxy
 route:
-  enabled: true
+  enabled: false
   host: ""  # Leave empty for auto-generated hostname
   path: ""
   annotations: {}

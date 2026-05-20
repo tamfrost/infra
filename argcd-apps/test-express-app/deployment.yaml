@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-express
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-express
+  namespace: test-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-express
+  template:
+    metadata:
+      labels:
+        app: test-express
+    spec:
+      containers:
+      - name: python-server
+        image: python:3.11-alpine
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            cd /tmp
+            cat > server.py <<'EOF'
+            from http.server import HTTPServer, BaseHTTPRequestHandler
+            import json
+            
+            class Handler(BaseHTTPRequestHandler):
+                def do_GET(self):
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    
+                    headers_str = json.dumps(dict(self.headers), indent=2)
+                    html = f"""<!DOCTYPE html>
+            <html>
+            <head><title>Test Python App</title></head>
+            <body>
+                <h1>Hello from Python HTTP Server!</h1>
+                <p>This is a simple test application</p>
+                <p>Request headers received:</p>
+                <pre>{headers_str}</pre>
+            </body>
+            </html>"""
+                    self.wfile.write(html.encode())
+                
+                def log_message(self, format, *args):
+                    print(f"{self.client_address[0]} - {format % args}")
+            
+            httpd = HTTPServer(('0.0.0.0', 3000), Handler)
+            print('Python HTTP server listening on port 3000')
+            httpd.serve_forever()
+            EOF
+            python server.py
+        ports:
+        - containerPort: 3000
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-express
+  namespace: test-express
+spec:
+  selector:
+    app: test-express
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: http

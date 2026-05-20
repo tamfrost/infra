@@ -1,0 +1,31 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  instances: 1
+  hostname:
+    hostname: keycloak-local.apps-crc.testing
+    strict: false
+    strictBackchannel: false
+  http:
+    httpEnabled: true
+  ingress:
+    enabled: false
+  unsupported:
+    podTemplate:
+      spec:
+        containers:
+          - name: keycloak
+            env:
+              - name: KC_HTTPS_CLIENT_AUTH
+                value: request
+              - name: KC_SPI_X509CERT_LOOKUP_PROVIDER
+                value: default
+              - name: KC_SPI_X509CERT_LOOKUP_DEFAULT_ENABLED
+                value: "true"
+              - name: KC_HOSTNAME_STRICT
+                value: "false"
+              - name: KC_PROXY_HEADERS
+                value: xforwarded
