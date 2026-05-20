@@ -4,7 +4,7 @@ replicaCount: 1
 # Helm will fail if these required values are missing
 image:
   pullPolicy: IfNotPresent
-  tag: "e648118"
+  tag: "27defc5"
 
 # GitHub Container Registry authentication
 # Set githubToken to automatically create imagePullSecret
@@ -88,3 +88,4 @@ affinity: {}
 
 command:
   - antenna-api
+  - "8080"
