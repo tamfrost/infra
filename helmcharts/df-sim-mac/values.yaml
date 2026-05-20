@@ -4,7 +4,7 @@ replicaCount: 1
 # Helm will fail if these required values are missing
 image:
   pullPolicy: IfNotPresent
-  tag: "27defc5"
+  tag: "f5b9e7c"
 
 # GitHub Container Registry authentication
 # Set githubToken to automatically create imagePullSecret
@@ -40,7 +40,7 @@ service:
 # OpenShift Route configuration (preferred for OpenShift clusters)
 route:
   enabled: true
-  host: ""  # Leave empty for auto-generated hostname
+  host: "df-sim.apps-crc.testing"
   path: ""
   annotations: {}
   tls:
