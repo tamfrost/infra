@@ -4,7 +4,7 @@ replicaCount: 1
 # Helm will fail if these required values are missing
 image:
   pullPolicy: IfNotPresent
-  tag: "8b137ba"
+  tag: "bfecffa"
 
 # GitHub Container Registry authentication
 # Set githubToken to automatically create imagePullSecret
