@@ -1,0 +1,22 @@
+appName: basic-app
+namespace: basic-app
+
+replicaCount: 1
+
+image:
+  registry: ""
+  repository: ""
+  tag: "2eed916"
+  pullPolicy: Always
+
+nginx:
+  image: nginx:alpine
+
+caCert: ""
+
+service:
+  port: 3000
+  nginxPort: 8443
+
+route:
+  host: ""
