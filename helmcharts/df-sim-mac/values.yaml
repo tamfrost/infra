@@ -4,7 +4,7 @@ replicaCount: 1
 # Helm will fail if these required values are missing
 image:
   pullPolicy: IfNotPresent
-  tag: "cdf3fd8"
+  tag: "1b8e9b4"
 
 # GitHub Container Registry authentication
 # Set githubToken to automatically create imagePullSecret
@@ -35,17 +35,33 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
-  targetPort: 8080  # Application serves HTTP, nginx handles TLS
+  targetPort: 4180  # oauth2-proxy port
+  appPort: 8080     # Application backend port
+
+# OAuth2 Proxy configuration
+oauth2Proxy:
+  enabled: true
+  image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+  clientID: "oauth2-proxy"
+  clientSecret: "ZagakvF7MSlQw3e8myAluGtCynpef7Y0"
+  cookieSecret: "P6TGLDH9R7klmYdzwPzlnv6v+fVFa9xO"
+  oidcIssuerUrl: "https://keycloak-local.apps-crc.testing/realms/df-sim"
+  # Empty value uses oauth2-proxy default login URL (no forced IDP hint)
+  loginUrl: ""
+  redirectUrl: "https://df-sim.apps-crc.testing/oauth2/callback"
+  emailDomain: "*"
+  sslInsecureSkipVerify: true
+  skipProviderButton: true
 
 # OpenShift Route configuration (preferred for OpenShift clusters)
-# Disabled - nginx proxy handles routing and TLS
+# Disabled - nginx proxy handles routing and client cert auth
 route:
   enabled: false
   host: "df-sim.apps-crc.testing"
   path: ""
   annotations: {}
   tls:
-    enabled: false
+    enabled: true
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
 

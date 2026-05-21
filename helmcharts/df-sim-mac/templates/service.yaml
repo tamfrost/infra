@@ -8,8 +8,8 @@ spec:
   type: {{ .Values.service.type }}
   ports:
   - port: {{ .Values.service.port }}
-    targetPort: https
+    targetPort: {{ if .Values.oauth2Proxy.enabled }}proxy{{ else }}http{{ end }}
     protocol: TCP
-    name: https
+    name: http
   selector:
     {{- include "df-sim.selectorLabels" . | nindent 4 }}

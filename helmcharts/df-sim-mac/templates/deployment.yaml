@@ -43,21 +43,74 @@ spec:
           {{- toYaml . | nindent 12 }}
         {{- end }}
         ports:
-        - name: https
-          containerPort: {{ .Values.service.targetPort }}
+        - name: http
+          containerPort: {{ .Values.service.appPort }}
           protocol: TCP
         livenessProbe:
           tcpSocket:
-            port: https
+            port: http
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           tcpSocket:
-            port: https
+            port: http
           initialDelaySeconds: 5
           periodSeconds: 5
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.oauth2Proxy.enabled }}
+      - name: oauth2-proxy
+        image: {{ .Values.oauth2Proxy.image }}
+        imagePullPolicy: IfNotPresent
+        args:
+          - --provider=oidc
+          - --oidc-issuer-url={{ .Values.oauth2Proxy.oidcIssuerUrl }}
+          {{- if .Values.oauth2Proxy.loginUrl }}
+          - --login-url={{ .Values.oauth2Proxy.loginUrl }}
+          {{- end }}
+          - --client-id={{ .Values.oauth2Proxy.clientID }}
+          - --client-secret={{ .Values.oauth2Proxy.clientSecret }}
+          - --cookie-secret={{ .Values.oauth2Proxy.cookieSecret }}
+          - --session-cookie-minimal=true
+          - --redirect-url={{ .Values.oauth2Proxy.redirectUrl }}
+          - --email-domain={{ .Values.oauth2Proxy.emailDomain }}
+          - --http-address=0.0.0.0:4180
+          - --upstream=http://127.0.0.1:{{ .Values.service.appPort }}
+          - --ssl-insecure-skip-verify={{ .Values.oauth2Proxy.sslInsecureSkipVerify }}
+          - --skip-provider-button={{ .Values.oauth2Proxy.skipProviderButton }}
+          - --flush-interval=1s
+        ports:
+        - name: proxy
+          containerPort: 4180
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: proxy
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: proxy
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
