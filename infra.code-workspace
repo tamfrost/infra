@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../infra"
+		}
+],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"statusBar.background": "#295673",
+		}
+	}
+}
