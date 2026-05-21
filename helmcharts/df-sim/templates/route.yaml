@@ -27,11 +27,23 @@ spec:
   {{- if .Values.route.tls.enabled }}
   tls:
     termination: {{ .Values.route.tls.termination }}
-    {{- if eq .Values.route.tls.termination "reencrypt" }}
+    {{- if and (eq .Values.route.tls.termination "reencrypt") .Values.route.tls.destinationCACertificate }}
     destinationCACertificate: {{ .Values.route.tls.destinationCACertificate }}
     {{- end }}
     {{- if .Values.route.tls.insecureEdgeTerminationPolicy }}
     insecureEdgeTerminationPolicy: {{ .Values.route.tls.insecureEdgeTerminationPolicy }}
+    {{- end }}
+    {{- if .Values.route.tls.certificate }}
+    certificate: |
+{{ .Values.route.tls.certificate | indent 6 }}
+    {{- end }}
+    {{- if .Values.route.tls.key }}
+    key: |
+{{ .Values.route.tls.key | indent 6 }}
+    {{- end }}
+    {{- if .Values.route.tls.caCertificate }}
+    caCertificate: |
+{{ .Values.route.tls.caCertificate | indent 6 }}
     {{- end }}
   {{- end }}
   wildcardPolicy: None
