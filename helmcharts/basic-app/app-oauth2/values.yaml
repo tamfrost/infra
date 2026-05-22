@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "1d19e97"
+  tag: "9ebaea3"
   pullPolicy: Always
 
 nginx:
