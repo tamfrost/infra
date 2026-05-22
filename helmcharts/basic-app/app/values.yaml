@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "6f57266"
+  tag: "1840772"
   pullPolicy: Always
 
 service:
@@ -15,3 +15,8 @@ service:
 route:
   enabled: false
   host: ""
+
+appConfig:
+  js: ""
+  json: ""
+  yaml: ""

@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "6f57266"
+  tag: "1840772"
   pullPolicy: Always
 
 nginx:
@@ -41,3 +41,8 @@ nginxCaKey: ""
 
 route:
   host: ""
+
+appConfig:
+  js: ""
+  json: ""
+  yaml: ""
