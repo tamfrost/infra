@@ -6,13 +6,19 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "c0707e5"
+  tag: "7187112"
   pullPolicy: Always
 
 nginx:
   image: nginx:alpine
 
 caCert: ""
+
+acmeDirectoryUrl: "-"
+acmeIssuerName: "internal-ca"
+
+nginxCaCert: ""
+nginxCaKey: ""
 
 service:
   port: 3000

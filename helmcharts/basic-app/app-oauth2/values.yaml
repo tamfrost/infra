@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "c0707e5"
+  tag: "7187112"
   pullPolicy: Always
 
 nginx:
@@ -32,6 +32,12 @@ oauth2Proxy:
   cookieRefresh: "20m0s"
   cookieExpire: "30m0s"
   codeChallengeMethod: "S256"
+
+acmeDirectoryUrl: "-"
+acmeIssuerName: "internal-ca"
+
+nginxCaCert: ""
+nginxCaKey: ""
 
 route:
   host: ""
