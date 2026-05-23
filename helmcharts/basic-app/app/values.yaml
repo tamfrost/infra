@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "6a53247"
+  tag: "878d53a"
   pullPolicy: Always
 
 service:
