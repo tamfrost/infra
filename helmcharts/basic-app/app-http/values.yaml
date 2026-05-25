@@ -13,8 +13,9 @@ service:
   port: 3000
 
 route:
-  enabled: false
   host: ""
+
+acmeIssuerName: "clusterissuer-primkey-acme"
 
 appConfig:
   js: ""
