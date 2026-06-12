@@ -5,14 +5,19 @@ metadata:
   name: {{ .Values.appName }}
   namespace: {{ .Values.namespace }}
   annotations:
+    {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
     cert-manager.io/cluster-issuer: {{ .Values.acmeIssuerName }}
+    {{- end }}
     ingress.pomerium.io/allow_any_authenticated_user: "true"
+    ingress.pomerium.io/pass_identity_headers: "true"
 spec:
   ingressClassName: pomerium
+  {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
   tls:
     - hosts:
         - {{ $host }}
       secretName: {{ .Values.appName }}-tls
+  {{- end }}
   rules:
     - host: {{ $host }}
       http:
