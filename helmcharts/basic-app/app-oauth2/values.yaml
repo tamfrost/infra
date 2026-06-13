@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "6badcfb"
+  tag: "cb59bb4"
   pullPolicy: Always
 
 nginx:
