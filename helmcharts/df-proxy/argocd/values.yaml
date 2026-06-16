@@ -3,12 +3,11 @@ argocd:
   # Namespace where ArgoCD is installed
   namespace: argocd
   
-  # GitHub credentials
-  github:
-    registry: ""  # Injected from .env: ghcr.io or containers.github.sys
-    username: ""  # Injected from .env
-    token: ""  # Set with --set argocd.github.token=YOUR_TOKEN
-  
+  # Git credentials for the infra repo holding the Helm charts
+  infraRepo:
+    username: ""  # Injected from .env (any non-empty value works with a PAT)
+    token: ""     # Injected from .env: INFRA_PAT_SECRET
+
   # Application settings
   application:
     # Name of the ArgoCD application
@@ -17,17 +16,16 @@ argocd:
     namespace: ""
     # ArgoCD project (use "default" or specify your project)
     project: default
-    
-    # Helm OCI chart source
+
+    # Helm chart source from the infra repo (git)
     source:
-      # OCI registry base URL (injected from .env: ghcr.io/tamfrost/df-proxy/helm)
-      # Note: Do NOT include oci:// prefix - ArgoCD adds it automatically
+      # Infra repo URL (injected from .env: INFRA_REGISTRY)
       repoURL: ""
-      # Chart name within the registry (injected from .env: df-proxy-app)
-      chart: ""
-      # Chart version - use wildcard to track latest
-      targetRevision: "*"
-      
+      # Path to the Helm chart within the infra repo (injected from .env: HELM_CHART_PATH/<chart>)
+      path: ""
+      # Git branch/tag/commit to track
+      targetRevision: "HEAD"
+
       # Helm values overrides (GitHub token injected from .env)
       helm:
         values: ""

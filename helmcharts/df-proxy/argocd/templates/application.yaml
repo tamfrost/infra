@@ -10,16 +10,13 @@ spec:
   
   source:
     repoURL: {{ required "A valid .Values.argocd.application.source.repoURL is required!" .Values.argocd.application.source.repoURL }}
-    chart: {{ required "A valid .Values.argocd.application.source.chart is required!" .Values.argocd.application.source.chart }}
+    path: {{ required "A valid .Values.argocd.application.source.path is required!" .Values.argocd.application.source.path }}
     targetRevision: "{{ .Values.argocd.application.source.targetRevision }}"
     helm:
       values: |
         {{- with .Values.argocd.application.source.helm.values }}
         {{- . | nindent 8 }}
         {{- end }}
-        github:
-          pullSecret:
-            token: "{{ .Values.argocd.github.token }}"
   
   destination:
     server: {{ .Values.argocd.application.destination.server }}
