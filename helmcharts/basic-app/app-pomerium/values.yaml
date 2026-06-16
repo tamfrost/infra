@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   registry: ""
   repository: ""
-  tag: "43b2b7e"
+  tag: "855636c"
   pullPolicy: Always
 
 service:
@@ -14,6 +14,12 @@ service:
 
 route:
   host: ""
+
+# Path prefixes served WITHOUT authentication (public Pomerium route).
+# Everything not listed here still requires login. Set to [] to make the
+# whole app authenticated.
+publicPaths:
+  - /api/info
 
 acmeIssuerName: "clusterissuer-primkey-acme"
 
