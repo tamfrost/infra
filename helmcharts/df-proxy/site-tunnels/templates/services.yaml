@@ -1,0 +1,26 @@
+{{- range $siteName, $site := .Values.sites }}
+{{- if $site.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $siteName }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    {{- include "site-tunnels.labels" $ | nindent 4 }}
+    site: {{ $siteName }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "site-tunnels.selectorLabels" $ | nindent 4 }}
+  ports:
+  - name: data
+    protocol: TCP
+    port: {{ $site.ports.local }}
+    targetPort: {{ $site.ports.local }}
+  - name: api
+    protocol: TCP
+    port: {{ $site.ports.apiLocal }}
+    targetPort: {{ $site.ports.apiLocal }}
+{{- end }}
+{{- end }}

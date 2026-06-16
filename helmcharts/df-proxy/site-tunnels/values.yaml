@@ -1,0 +1,34 @@
+namespace: df-proxy
+
+image:
+  repository: image-registry.openshift-image-registry.svc:5000/openshift/tools
+  tag: latest
+
+ssh:
+  serverAliveInterval: 30
+  serverAliveCountMax: 3
+  connectTimeout: 10
+  reconnectDelay: 5
+
+# Site entries are injected at deploy time from config/config.ts via bin/df-proxy.js.
+# Each entry follows this shape:
+#   <siteName>:
+#     enabled: true
+#     apiServer: <hostname>
+#     sshUserName: <user>
+#     sshKeySecret: <siteName>-ssh-key
+#     ports:
+#       local: <int>      # local port for data tunnel
+#       remote: <int>     # remote port for data tunnel
+#       apiLocal: <int>   # local port for API tunnel
+#       apiRemote: <int>  # remote port for API tunnel
+#       ssh: <int>        # SSH port on the remote host
+sites: {}
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi

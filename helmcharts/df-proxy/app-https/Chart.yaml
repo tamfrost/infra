@@ -1,0 +1,6 @@
+apiVersion: v2
+name: df-proxy-app-https
+description: Direction Finding Proxy Application (HTTPS / edge TLS)
+type: application
+version: 1.0.2
+appVersion: "1.0.2"

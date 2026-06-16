@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "df-proxy.fullname" . }}
+  labels:
+    {{- include "df-proxy.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "df-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        helm.sh/chart-version: {{ .Chart.Version }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "df-proxy.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.github.pullSecret.create }}
+      imagePullSecrets:
+        - name: {{ .Values.github.pullSecret.name }}
+      {{- end }}
+      serviceAccountName: {{ include "df-proxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ required "A valid .Values.image.repository is required! Use --set image.repository=..." .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.command }}
+        command: {{ toJson .Values.command }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        env:
+        {{- toYaml .Values.env | nindent 8 }}
+        {{- if .Values.postgresql.enabled }}
+        - name: POSTGRES_HOST
+          value: {{ include "df-proxy.fullname" . }}-postgresql
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.auth.username }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "df-proxy.fullname" . }}-postgresql
+              key: password
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.auth.database }}
+        {{- end }}
+        {{- if .Values.mongodb.enabled }}
+        - name: MONGODB_HOST
+          value: {{ include "df-proxy.fullname" . }}-mongodb
+        - name: MONGODB_USER
+          value: {{ .Values.mongodb.auth.username }}
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "df-proxy.fullname" . }}-mongodb
+              key: mongodb-password
+        - name: MONGODB_DB
+          value: {{ .Values.mongodb.auth.database }}
+        {{- end }}
+        volumeMounts:
+        - name: crontab
+          mountPath: /app/monitor.crontab
+          subPath: monitor.crontab
+          readOnly: true
+        - name: ssh-key
+          mountPath: /app/id_rsa
+          subPath: id_rsa
+          readOnly: true
+        - name: config-js
+          mountPath: /app/dist/config/config.js
+          subPath: config.js
+          readOnly: true
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: crontab
+        configMap:
+          name: {{ include "df-proxy.fullname" . }}-crontab
+      - name: ssh-key
+        secret:
+          secretName: mock-ssh-key
+          defaultMode: 0400
+      - name: config-js
+        configMap:
+          name: df-proxy-config-js
+      {{- if .Values.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.hostAliases | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

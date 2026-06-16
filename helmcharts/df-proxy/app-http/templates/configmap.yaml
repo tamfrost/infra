@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "df-proxy.fullname" . }}-crontab
+  labels:
+    {{- include "df-proxy.labels" . | nindent 4 }}
+data:
+  monitor.crontab: |
+{{ .Values.crontab | default (.Files.Get "monitor.crontab") | indent 4 }}

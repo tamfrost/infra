@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site-tunnels
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "site-tunnels.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "site-tunnels.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "site-tunnels.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      {{- range $siteName, $site := .Values.sites }}
+      {{- if $site.enabled }}
+      - name: {{ $siteName }}-tunnel
+        image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Adding known host for {{ $siteName }}..."
+          ssh-keyscan -p {{ $site.ports.ssh }} -H {{ $site.apiServer }} > /tmp/known_hosts_{{ $siteName }} 2>/dev/null || true
+
+          echo "Testing SSH connection to {{ $siteName }}..."
+          ssh -i /ssh-key-{{ $siteName }}/id_rsa \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/tmp/known_hosts_{{ $siteName }} \
+            -o BatchMode=yes \
+            -o ConnectTimeout={{ $.Values.ssh.connectTimeout }} \
+            -p {{ $site.ports.ssh }} \
+            {{ $site.sshUserName }}@{{ $site.apiServer }} "echo SSH connection successful" || \
+            echo "SSH connection test failed, will retry in tunnel loop..."
+
+          echo "Establishing SSH tunnels for {{ $siteName }}..."
+          while true; do
+            ssh -i /ssh-key-{{ $siteName }}/id_rsa \
+                -o StrictHostKeyChecking=no \
+                -o UserKnownHostsFile=/tmp/known_hosts_{{ $siteName }} \
+                -o ServerAliveInterval={{ $.Values.ssh.serverAliveInterval }} \
+                -o ServerAliveCountMax={{ $.Values.ssh.serverAliveCountMax }} \
+                -o ExitOnForwardFailure=yes \
+                -p {{ $site.ports.ssh }} \
+                -N \
+                -L 0.0.0.0:{{ $site.ports.local }}:localhost:{{ $site.ports.remote }} \
+                -L 0.0.0.0:{{ $site.ports.apiLocal }}:localhost:{{ $site.ports.apiRemote }} \
+                {{ $site.sshUserName }}@{{ $site.apiServer }} || \
+              echo "{{ $siteName }} tunnel disconnected, reconnecting in {{ $.Values.ssh.reconnectDelay }}s..."
+            sleep {{ $.Values.ssh.reconnectDelay }}
+          done
+        volumeMounts:
+        - name: ssh-key-{{ $siteName }}
+          mountPath: /ssh-key-{{ $siteName }}
+          readOnly: true
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          {{- toYaml $.Values.resources | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      volumes:
+      {{- range $siteName, $site := .Values.sites }}
+      {{- if $site.enabled }}
+      - name: ssh-key-{{ $siteName }}
+        secret:
+          secretName: {{ $site.sshKeySecret }}
+          defaultMode: 0400
+      {{- end }}
+      {{- end }}

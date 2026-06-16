@@ -1,0 +1,67 @@
+{{- $host := .Values.route.host | replace ".apps." "." -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "df-proxy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
+    cert-manager.io/cluster-issuer: {{ .Values.acmeIssuerName }}
+    {{- end }}
+    ingress.pomerium.io/allow_any_authenticated_user: "true"
+    ingress.pomerium.io/pass_identity_headers: "true"
+spec:
+  ingressClassName: pomerium
+  {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
+  tls:
+    - hosts:
+        - {{ $host }}
+      secretName: {{ include "df-proxy.fullname" . }}-tls
+  {{- end }}
+  rules:
+    - host: {{ $host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "df-proxy.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+{{- if .Values.publicPaths }}
+---
+# Public route(s): no authentication required. Pomerium matches the most
+# specific path prefix first, so these take precedence over the "/" route above.
+# Shares the TLS secret; only the Ingress above carries the cert-manager
+# annotation so the cert is issued exactly once.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "df-proxy.fullname" . }}-public
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    ingress.pomerium.io/allow_public_unauthenticated_access: "true"
+    ingress.pomerium.io/pass_identity_headers: "true"
+spec:
+  ingressClassName: pomerium
+  {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
+  tls:
+    - hosts:
+        - {{ $host }}
+      secretName: {{ include "df-proxy.fullname" . }}-tls
+  {{- end }}
+  rules:
+    - host: {{ $host }}
+      http:
+        paths:
+          {{- range .Values.publicPaths }}
+          - path: {{ . }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "df-proxy.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+          {{- end }}
+{{- end }}

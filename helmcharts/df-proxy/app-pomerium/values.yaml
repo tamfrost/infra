@@ -1,0 +1,98 @@
+replicaCount: 1
+
+image:
+  repository: ""  # Required: must be set via --set image.repository=...
+  pullPolicy: Always
+  tag: "2a37cdb"
+
+github:
+  pullSecret:
+    create: true
+    name: ghcr-secret
+    registry: ""
+    username: ""
+    token: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# Crontab contents — injected at deploy time via --set-file crontab=../../monitor.crontab
+crontab: ""
+
+route:
+  host: ""  # Required for Pomerium ingress — e.g. df-proxy.apps.crc.testing
+
+acmeIssuerName: "clusterissuer-primkey-acme"
+
+# Path prefixes served without authentication (public Pomerium route).
+# Everything else still requires login.
+publicPaths:
+  - /api/v1
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  - name: PORT
+    value: "8080"
+  - name: NODE_ENV
+    value: "production"
+  - name: POSTGRES_HOST
+    value: ""
+  - name: MONGODB_URL
+    value: "mongodb://admin:password@mongodb.mongodb.svc.cluster.local:27017/df-proxy?authSource=admin"
+
+postgresql:
+  enabled: false
+  host: postgres.postgres.svc.cluster.local
+  port: 5432
+  auth:
+    username: admin
+    password: password
+    database: df-proxy
+
+mongodb:
+  enabled: false
+  host: mongodb.mongodb.svc.cluster.local
+  port: 27017
+  auth:
+    username: admin
+    password: password
+    database: df-proxy
