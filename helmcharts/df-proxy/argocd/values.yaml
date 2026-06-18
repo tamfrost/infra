@@ -2,11 +2,10 @@
 argocd:
   # Namespace where ArgoCD is installed
   namespace: argocd
-  
-  # Git credentials for the infra repo holding the Helm charts
-  infraRepo:
-    username: ""  # Injected from .env (any non-empty value works with a PAT)
-    token: ""     # Injected from .env: INFRA_PAT_SECRET
+
+  # Note: the infra repo must be registered with ArgoCD separately
+  # (e.g. via "Connect Repo" in the ArgoCD UI/CLI) — this chart does not
+  # create repository-credential Secrets.
 
   # Application settings
   application:
