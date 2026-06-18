@@ -82,11 +82,17 @@ spec:
           mountPath: /app/dist/config/config.js
           subPath: config.js
           readOnly: true
+        startupProbe:
+          httpGet:
+            path: /api/v1/ping
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 24
         readinessProbe:
           httpGet:
             path: /api/v1/ping
             port: http
-          initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 5
         resources:
