@@ -98,4 +98,4 @@ mongodb:
     database: df-proxy
 
 synctest:
-  enabled: true
+  enabled: false
