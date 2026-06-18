@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "1b39f5c"
+  tag: "b0e6e71"
 
 github:
   pullSecret:
@@ -98,4 +98,4 @@ mongodb:
     database: df-proxy
 
 synctest:
-  enabled: false
+  enabled: true

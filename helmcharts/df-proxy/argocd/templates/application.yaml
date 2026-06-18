@@ -37,3 +37,7 @@ spec:
     retry:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.argocd.application.syncPolicy.managedNamespaceMetadata }}
+    managedNamespaceMetadata:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}

@@ -62,3 +62,11 @@ argocd:
           duration: 5s
           factor: 2
           maxDuration: 3m
+
+      # Metadata applied to the auto-created destination namespace.
+      # The managed-by label grants the OpenShift GitOps controller RBAC to
+      # manage resources in the target namespace. The value MUST match the
+      # namespace where the GitOps instance / application-controller runs.
+      managedNamespaceMetadata:
+        labels:
+          argocd.argoproj.io/managed-by: openshift-gitops

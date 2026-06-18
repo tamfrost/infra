@@ -1,0 +1,26 @@
+# Grants the OpenShift GitOps application-controller permission to manage
+# resources in the df-proxy namespace.
+#
+# WHY THIS EXISTS:
+#   The default OpenShift GitOps instance can only manage its own namespace.
+#   Relying on the `argocd.argoproj.io/managed-by` label to grant access is
+#   racy: ArgoCD creates the namespace and tries to apply resources before the
+#   operator reconciles the label into a RoleBinding, so the first sync fails.
+#   This binding is explicit and exists before any sync, eliminating the race.
+#
+# APPLY ONCE (out-of-band, NOT through ArgoCD — chicken-and-egg otherwise):
+#   oc apply -f .helm/argocd/rbac/application-controller-rolebinding.yaml
+#
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gitops-application-controller-admin
+  namespace: df-proxy
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops
