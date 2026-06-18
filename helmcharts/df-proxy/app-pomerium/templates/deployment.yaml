@@ -86,9 +86,9 @@ spec:
           httpGet:
             path: /api/v1/ping
             port: http
-          periodSeconds: 5
-          timeoutSeconds: 5
-          failureThreshold: 24
+          periodSeconds: 2
+          timeoutSeconds: 3
+          failureThreshold: 30
         readinessProbe:
           httpGet:
             path: /api/v1/ping
