@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "b0e6e71"
+  tag: "26aa7ee"
 
 github:
   pullSecret:
@@ -51,7 +51,7 @@ route:
 resources:
   limits:
     cpu: 2000m
-    memory: 512Mi
+    memory: 1Gi
   requests:
     cpu: 100m
     memory: 128Mi
