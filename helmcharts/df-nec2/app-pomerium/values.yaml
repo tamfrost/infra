@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "a9efe59"
+  tag: "dab79f9"
 
 github:
   pullSecret:
@@ -42,7 +42,9 @@ wsPort: 30001
 probePath: /api/v1/ping
 
 route:
-  host: ""  # Required for Pomerium ingress — e.g. df-nec2.apps.crc.testing
+  host: ""  # Required for Pomerium ingress — e.g. df-nec2.apps-crc.testing
+  # Require Pomerium login to reach the app. false = served publicly, no auth.
+  requireAuth: false
 
 acmeIssuerName: "clusterissuer-primkey-acme"
 
