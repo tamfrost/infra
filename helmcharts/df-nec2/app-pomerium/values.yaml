@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "dab79f9"
+  tag: "7690740"
 
 github:
   pullSecret:
@@ -29,6 +29,7 @@ podSecurityContext: {}
 # locked-down non-root user like the df-proxy chart. Tighten as needed.
 securityContext:
   runAsNonRoot: false
+  runAsUser: 0
 
 service:
   type: ClusterIP
@@ -43,15 +44,9 @@ probePath: /api/v1/ping
 
 route:
   host: ""  # Required for Pomerium ingress — e.g. df-nec2.apps-crc.testing
-  # Require Pomerium login to reach the app. false = served publicly, no auth.
-  requireAuth: false
 
 acmeIssuerName: "clusterissuer-primkey-acme"
 
-# Path prefixes served without authentication (public Pomerium route).
-# Everything else still requires login.
-publicPaths:
-  - /api/v1
 
 resources:
   limits:
@@ -74,3 +69,13 @@ tolerations: []
 affinity: {}
 
 env: []
+
+# MATLAB license is host-locked to MAC 02:42:ac:11:00:02 (host ID 0242ac110002).
+# The init container sets eth0 to this address before MATLAB starts.
+macAddress: "02:42:ac:11:00:02"
+
+openshift:
+  # Bind the anyuid SCC to the service account so the pod can run as root
+  # and use NET_ADMIN (required for the MAC-address init container).
+  # Set to false on non-OpenShift clusters.
+  anyuidScc: true

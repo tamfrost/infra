@@ -1,0 +1,10 @@
+{{- if .Values.macAddress }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "df-nec2.fullname" . }}-lmhostid
+  labels:
+    {{- include "df-nec2.labels" . | nindent 4 }}
+data:
+  lmhostid: {{ .Values.macAddress | replace ":" "" | quote }}
+{{- end }}
