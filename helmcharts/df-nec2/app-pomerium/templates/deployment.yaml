@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "df-nec2.fullname" . }}
+  labels:
+    {{- include "df-nec2.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "df-nec2.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        helm.sh/chart-version: {{ .Chart.Version }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "df-nec2.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.github.pullSecret.create }}
+      imagePullSecrets:
+        - name: {{ .Values.github.pullSecret.name }}
+      {{- end }}
+      serviceAccountName: {{ include "df-nec2.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ required "A valid .Values.image.repository is required! Use --set image.repository=..." .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.command }}
+        command: {{ toJson .Values.command }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        - name: ws
+          containerPort: {{ .Values.wsPort }}
+          protocol: TCP
+        {{- with .Values.env }}
+        env:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.probePath }}
+            port: http
+          periodSeconds: 2
+          timeoutSeconds: 3
+          failureThreshold: 60
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.probePath }}
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

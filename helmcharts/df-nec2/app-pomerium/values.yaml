@@ -1,0 +1,74 @@
+replicaCount: 1
+
+image:
+  repository: ""  # Required: must be set via --set image.repository=...
+  pullPolicy: Always
+  tag: "a9efe59"
+
+github:
+  pullSecret:
+    create: true
+    name: ghcr-secret
+    registry: ""
+    username: ""
+    token: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+# The image entrypoint launches MATLAB + a Python server, so it is not run as a
+# locked-down non-root user like the df-proxy chart. Tighten as needed.
+securityContext:
+  runAsNonRoot: false
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# MATLAB websocket port. It is only reached in-pod (the Flask server connects to
+# localhost:30001), so it is exposed as a containerPort but not via the Service.
+wsPort: 30001
+
+# HTTP path used for startup / readiness probes.
+probePath: /api/v1/ping
+
+route:
+  host: ""  # Required for Pomerium ingress — e.g. df-nec2.apps.crc.testing
+
+acmeIssuerName: "clusterissuer-primkey-acme"
+
+# Path prefixes served without authentication (public Pomerium route).
+# Everything else still requires login.
+publicPaths:
+  - /api/v1
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env: []

@@ -1,0 +1,71 @@
+# ArgoCD Application configuration
+argocd:
+  # Namespace where ArgoCD is installed
+  namespace: openshift-gitops
+
+  # Note: the infra repo must be registered with ArgoCD separately
+  # (e.g. via "Connect Repo" in the ArgoCD UI/CLI) — this chart does not
+  # create repository-credential Secrets.
+
+  # Application settings
+  application:
+    # Name of the ArgoCD application
+    name: df-nec2
+    # Namespace where the application will be deployed (defaults to helm release namespace if not specified)
+    namespace: ""
+    # ArgoCD project (use "default" or specify your project)
+    project: default
+
+    # Helm chart source from the infra repo (git)
+    source:
+      # Infra repo URL (injected from .env: INFRA_REGISTRY)
+      repoURL: ""
+      # Path to the Helm chart within the infra repo (injected from .env: HELM_CHART_PATH/<chart>)
+      path: ""
+      # Git branch/tag/commit to track
+      targetRevision: "HEAD"
+
+      # Helm values overrides (image + pull-secret creds injected from .env)
+      helm:
+        values: ""
+
+    # Destination cluster and namespace
+    destination:
+      # Kubernetes cluster (use "in-cluster" for the same cluster as ArgoCD)
+      server: https://kubernetes.default.svc
+      # Target namespace
+      namespace: df-nec2
+
+    # Sync policy
+    syncPolicy:
+      # Automatically sync when changes are detected
+      automated:
+        # Automatically create namespace if it doesn't exist
+        prune: true
+        # Allow empty resources
+        selfHeal: true
+        # Allow resources to be deleted
+        allowEmpty: false
+
+      # Sync options
+      syncOptions:
+        - CreateNamespace=true
+        - PrunePropagationPolicy=foreground
+        - PruneLast=true
+        - RespectIgnoreDifferences=false
+
+      # Retry policy
+      retry:
+        limit: 5
+        backoff:
+          duration: 5s
+          factor: 2
+          maxDuration: 3m
+
+      # Metadata applied to the auto-created destination namespace.
+      # The managed-by label grants the OpenShift GitOps controller RBAC to
+      # manage resources in the target namespace. The value MUST match the
+      # namespace where the GitOps instance / application-controller runs.
+      managedNamespaceMetadata:
+        labels:
+          argocd.argoproj.io/managed-by: openshift-gitops
