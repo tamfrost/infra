@@ -1,4 +1,4 @@
-{{- if .Values.route.host -}}
+{{- if and .Values.route.host (not .Values.argocd) -}}
 {{- $host := .Values.route.host | replace ".apps." "." -}}
 apiVersion: route.openshift.io/v1
 kind: Route

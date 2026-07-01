@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "7690740"
+  tag: "016b32a"
 
 github:
   pullSecret:
@@ -71,11 +71,12 @@ affinity: {}
 env: []
 
 # MATLAB license is host-locked to MAC 02:42:ac:11:00:02 (host ID 0242ac110002).
-# The init container sets eth0 to this address before MATLAB starts.
+# LD_PRELOAD in the image intercepts MAC lookups and returns this address to MATLAB.
 macAddress: "02:42:ac:11:00:02"
 
+argocd: false
+
 openshift:
-  # Bind the anyuid SCC to the service account so the pod can run as root
-  # and use NET_ADMIN (required for the MAC-address init container).
+  # Bind the anyuid SCC to the service account so the pod can run as root.
   # Set to false on non-OpenShift clusters.
   anyuidScc: true
