@@ -1,4 +1,4 @@
-{{- if .Values.macAddress }}
+{{- if and .Values.macAddress .Values.networkAttachment.enabled }}
 apiVersion: k8s.cni.cncf.io/v1
 kind: NetworkAttachmentDefinition
 metadata:

@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "016b32a"
+  tag: "c2fc45a"
 
 github:
   pullSecret:
@@ -25,11 +25,12 @@ podAnnotations: {}
 
 podSecurityContext: {}
 
-# The image entrypoint launches MATLAB + a Python server, so it is not run as a
-# locked-down non-root user like the df-proxy chart. Tighten as needed.
+# The image runs as non-root. fakemac.so handles MAC spoofing at the
+# application layer via LD_PRELOAD, so root is not required.
+# No explicit runAsUser — let OpenShift assign a UID from the restricted-v2
+# SCC range (same pattern as df-proxy).
 securityContext:
-  runAsNonRoot: false
-  runAsUser: 0
+  runAsNonRoot: true
 
 service:
   type: ClusterIP
@@ -73,6 +74,12 @@ env: []
 # MATLAB license is host-locked to MAC 02:42:ac:11:00:02 (host ID 0242ac110002).
 # LD_PRELOAD in the image intercepts MAC lookups and returns this address to MATLAB.
 macAddress: "02:42:ac:11:00:02"
+
+# NetworkAttachmentDefinition for MAC address binding on the pod interface.
+# Disabled by default — fakemac.so handles MAC spoofing at the application layer.
+# Enable only if the cluster admission policy allows NAD creation.
+networkAttachment:
+  enabled: false
 
 argocd: false
 

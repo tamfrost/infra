@@ -15,7 +15,7 @@ spec:
     metadata:
       annotations:
         helm.sh/chart-version: {{ .Chart.Version }}
-        {{- if .Values.macAddress }}
+        {{- if and .Values.macAddress .Values.networkAttachment.enabled }}
         k8s.v1.cni.cncf.io/networks: '[{"name":"{{ include "df-nec2.fullname" . }}-matlab-mac","mac":"{{ .Values.macAddress }}"}]'
         {{- end }}
         {{- with .Values.podAnnotations }}
