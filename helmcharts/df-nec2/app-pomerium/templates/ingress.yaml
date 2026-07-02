@@ -8,11 +8,7 @@ metadata:
     {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
     cert-manager.io/cluster-issuer: {{ .Values.acmeIssuerName }}
     {{- end }}
-    {{- if .Values.route.requireAuth }}
-    ingress.pomerium.io/allow_any_authenticated_user: "true"
-    {{- else }}
     ingress.pomerium.io/allow_public_unauthenticated_access: "true"
-    {{- end }}
     ingress.pomerium.io/pass_identity_headers: "true"
 spec:
   ingressClassName: pomerium
@@ -33,39 +29,3 @@ spec:
                 name: {{ include "df-nec2.fullname" . }}
                 port:
                   number: {{ .Values.service.port }}
-{{- if and .Values.publicPaths .Values.route.requireAuth }}
----
-# Public route(s): no authentication required. Pomerium matches the most
-# specific path prefix first, so these take precedence over the "/" route above.
-# Shares the TLS secret; only the Ingress above carries the cert-manager
-# annotation so the cert is issued exactly once.
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ include "df-nec2.fullname" . }}-public
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    ingress.pomerium.io/allow_public_unauthenticated_access: "true"
-    ingress.pomerium.io/pass_identity_headers: "true"
-spec:
-  ingressClassName: pomerium
-  {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
-  tls:
-    - hosts:
-        - {{ $host }}
-      secretName: {{ include "df-nec2.fullname" . }}-tls
-  {{- end }}
-  rules:
-    - host: {{ $host }}
-      http:
-        paths:
-          {{- range .Values.publicPaths }}
-          - path: {{ . }}
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "df-nec2.fullname" $ }}
-                port:
-                  number: {{ $.Values.service.port }}
-          {{- end }}
-{{- end }}

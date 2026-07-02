@@ -1,0 +1,18 @@
+{{- if and .Values.route.host (not .Values.argocd) -}}
+{{- $host := .Values.route.host | replace ".apps." "." -}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pomerium-{{ include "df-nec2.fullname" . }}
+  namespace: pomerium
+spec:
+  host: {{ $host }}
+  to:
+    kind: Service
+    name: pomerium-proxy
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}

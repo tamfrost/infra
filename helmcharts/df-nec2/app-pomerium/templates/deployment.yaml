@@ -15,6 +15,9 @@ spec:
     metadata:
       annotations:
         helm.sh/chart-version: {{ .Chart.Version }}
+        {{- if .Values.macAddress }}
+        k8s.v1.cni.cncf.io/networks: '[{"name":"{{ include "df-nec2.fullname" . }}-matlab-mac","mac":"{{ .Values.macAddress }}"}]'
+        {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -63,6 +66,18 @@ spec:
           timeoutSeconds: 5
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.macAddress }}
+        volumeMounts:
+        - name: lmhostid
+          mountPath: /etc/lmhostid
+          subPath: lmhostid
+        {{- end }}
+      {{- if .Values.macAddress }}
+      volumes:
+      - name: lmhostid
+        configMap:
+          name: {{ include "df-nec2.fullname" . }}-lmhostid
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
