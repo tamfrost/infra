@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "47989a8"
+  tag: "12cafac"
 
 github:
   pullSecret:
@@ -51,11 +51,11 @@ acmeIssuerName: "clusterissuer-primkey-acme"
 
 resources:
   limits:
-    cpu: 2000m
-    memory: 2Gi
+    cpu: 4000m
+    memory: 8Gi
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 500m
+    memory: 1Gi
 
 autoscaling:
   enabled: false
@@ -69,7 +69,12 @@ tolerations: []
 
 affinity: {}
 
-env: []
+# OMP_NUM_THREADS matches the CPU limit so MATLAB's BLAS/LAPACK layer does not
+# oversubscribe the host's cores and get CFS-throttled (the main cause of slow
+# MATLAB in a CPU-limited pod).
+env:
+  - name: OMP_NUM_THREADS
+    value: "4"
 
 # MATLAB license is host-locked to MAC 02:42:ac:11:00:02 (host ID 0242ac110002).
 # LD_PRELOAD in the image intercepts MAC lookups and returns this address to MATLAB.
