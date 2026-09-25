@@ -1,0 +1,91 @@
+replicaCount: 1
+
+image:
+  repository: ""  # Required: must be set via --set image.repository=...
+  pullPolicy: Always
+  tag: "34dae45"
+
+github:
+  pullSecret:
+    create: true
+    name: ghcr-secret
+    registry: ""
+    username: ""
+    token: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+# The image runs as non-root (USER 1000). No explicit runAsUser — let OpenShift assign a UID
+# from the restricted-v2 SCC range.
+securityContext:
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# HTTP path used for startup / readiness probes.
+# The app serves index.html at "/".
+probePath: /
+
+route:
+  host: ""  # Required for Pomerium ingress — e.g. spectrogram.apps-crc.testing
+
+acmeIssuerName: "clusterissuer-primkey-acme"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# sd servers rendered into /app/config.js (see config.template.js).
+# sshKey '' connects directly to host:remotePort without an ssh tunnel.
+# For ssh sites, put the keys in sshKeys.existingSecret and reference them as sshKey: keys/<file>.
+sdServers:
+  - { name: site1, host: localhost, user: "", localPort: 58081, remotePort: 58081, apiPath: spectrogramdf/rest/api/v1, sshKey: "" }
+  - { name: site2, host: localhost, user: "", localPort: 58081, remotePort: 58081, apiPath: spectrogramdf/rest/api/v1, sshKey: "" }
+  - { name: site3, host: localhost, user: "", localPort: 58081, remotePort: 58081, apiPath: spectrogramdf/rest/api/v1, sshKey: "" }
+
+sshKeys:
+  # Name of an existing Secret whose keys are ssh key files, mounted at /app/keys
+  existingSecret: ""
+
+# Mock sd server sidecar (same image, node mock/server.js). Shares the pod network,
+# so sdServers reach it at localhost:<port>.
+mock:
+  enabled: true
+  port: 58081
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env: []

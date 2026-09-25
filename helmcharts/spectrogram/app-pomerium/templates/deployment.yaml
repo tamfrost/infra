@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "spectrogram.fullname" . }}
+  labels:
+    {{- include "spectrogram.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "spectrogram.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        helm.sh/chart-version: {{ .Chart.Version }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "spectrogram.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.github.pullSecret.create }}
+      imagePullSecrets:
+        - name: {{ .Values.github.pullSecret.name }}
+      {{- end }}
+      serviceAccountName: {{ include "spectrogram.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ required "A valid .Values.image.repository is required! Use --set image.repository=..." .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.command }}
+        command: {{ toJson .Values.command }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.port }}
+          protocol: TCP
+        {{- with .Values.env }}
+        env:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.js
+          subPath: config.js
+        {{- if .Values.sshKeys.existingSecret }}
+        - name: ssh-keys
+          mountPath: /app/keys
+          readOnly: true
+        {{- end }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.probePath }}
+            port: http
+          periodSeconds: 2
+          timeoutSeconds: 3
+          failureThreshold: 60
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.probePath }}
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.mock.enabled }}
+      - name: mock
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["node", "mock/server.js"]
+        ports:
+        - name: mock
+          containerPort: {{ .Values.mock.port }}
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: mock
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          {{- toYaml .Values.mock.resources | nindent 12 }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "spectrogram.fullname" . }}-config
+      {{- if .Values.sshKeys.existingSecret }}
+      - name: ssh-keys
+        secret:
+          secretName: {{ .Values.sshKeys.existingSecret }}
+          defaultMode: 0400
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

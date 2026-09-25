@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "spectrogram.fullname" . }}-config
+  labels:
+    {{- include "spectrogram.labels" . | nindent 4 }}
+data:
+  config.js: |
+    const config = {};
+
+    config.sdServers = {{ toJson .Values.sdServers }};
+
+    module.exports = {
+        config
+    }
