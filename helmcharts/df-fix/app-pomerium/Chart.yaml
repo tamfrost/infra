@@ -1,0 +1,6 @@
+apiVersion: v2
+name: df-fix-app-pomerium
+description: DF-Fix Application with Pomerium ingress (TLS via cert-manager)
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

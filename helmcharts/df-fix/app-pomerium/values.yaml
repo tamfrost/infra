@@ -1,0 +1,73 @@
+replicaCount: 1
+
+image:
+  repository: ""  # Required: must be set via --set image.repository=...
+  pullPolicy: Always
+  tag: "7b5c3e0"
+
+github:
+  pullSecret:
+    create: true
+    name: ghcr-secret
+    registry: ""
+    username: ""
+    token: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+# The image runs as non-root. No explicit runAsUser — let OpenShift assign a UID
+# from the restricted-v2 SCC range.
+securityContext:
+  runAsNonRoot: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+# HTTP path used for startup / readiness probes.
+# The app serves index.html at "/" and has no dedicated /api/v1/ping endpoint.
+probePath: /
+
+route:
+  host: ""  # Required for Pomerium ingress — e.g. df-fix.apps-crc.testing
+
+acmeIssuerName: "clusterissuer-primkey-acme"
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env: []
+
+argocd: false
+
+openshift:
+  # Bind the anyuid SCC to the service account so the pod can run as root.
+  # Set to false on non-OpenShift clusters.
+  anyuidScc: true
