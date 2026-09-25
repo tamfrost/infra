@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "855d3cb"
+  tag: "39181ad"
 
 github:
   pullSecret:
