@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "34dae45"
+  tag: "72847ee"
 
 github:
   pullSecret:
@@ -40,6 +40,13 @@ probePath: /
 
 route:
   host: ""  # Required for Pomerium ingress — e.g. spectrogram.apps-crc.testing
+
+ingress:
+  # openshift-default: the OpenShift router creates the Route for this Ingress in the app
+  #   namespace automatically, so the app is reachable with nothing else in the cluster.
+  # pomerium: served by the Pomerium ingress controller; this also needs a passthrough Route
+  #   for the host to the pomerium-proxy service in the pomerium namespace.
+  className: openshift-default
 
 acmeIssuerName: "clusterissuer-primkey-acme"
 

@@ -8,10 +8,12 @@ metadata:
     {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
     cert-manager.io/cluster-issuer: {{ .Values.acmeIssuerName }}
     {{- end }}
+    {{- if eq .Values.ingress.className "pomerium" }}
     ingress.pomerium.io/allow_public_unauthenticated_access: "true"
     ingress.pomerium.io/pass_identity_headers: "true"
+    {{- end }}
 spec:
-  ingressClassName: pomerium
+  ingressClassName: {{ .Values.ingress.className }}
   {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
   tls:
     - hosts:
