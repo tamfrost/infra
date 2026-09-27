@@ -3,13 +3,13 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "cc87ddd"
+  tag: "d3cd884"
 
 github:
   pullSecret:
     create: true
     name: ghcr-secret
-    registry: ""  # Injected from .env: ghcr.io or containers.github.sys
+    registry: ""  # Injected from .env
     username: ""  # Injected from .env
     token: ""  # Required: must be set via --set github.pullSecret.token=$GITHUB_TOKEN
 
