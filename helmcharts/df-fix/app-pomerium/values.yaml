@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "d3ffb8d"
+  tag: "2b6fe21"
 
 github:
   pullSecret:
@@ -35,8 +35,8 @@ service:
   port: 8080
 
 # HTTP path used for startup / readiness probes.
-# The app serves index.html at "/" and has no dedicated /api/v1/ping endpoint.
-probePath: /
+# /api/v1/ping is a lightweight liveness endpoint served by the Express app.
+probePath: /api/v1/ping
 
 route:
   host: ""  # Required for Pomerium ingress — e.g. df-fix.apps-crc.testing
