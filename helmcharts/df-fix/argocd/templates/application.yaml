@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: {{ .Values.argocd.application.name }}
-  namespace: {{ .Values.argocd.namespace }}
+  namespace: {{ required "argocd.namespace is required (set ARGOCD_NAMESPACE in .env)" .Values.argocd.namespace }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -41,7 +41,9 @@ spec:
     retry:
       {{- toYaml . | nindent 6 }}
     {{- end }}
-    {{- with .Values.argocd.application.syncPolicy.managedNamespaceMetadata }}
+    {{- $nsMeta := deepCopy (.Values.argocd.application.syncPolicy.managedNamespaceMetadata | default dict) }}
+    {{- $labels := $nsMeta.labels | default dict }}
+    {{- $_ := set $labels "argocd.argoproj.io/managed-by" .Values.argocd.namespace }}
+    {{- $_ := set $nsMeta "labels" $labels }}
     managedNamespaceMetadata:
-      {{- toYaml . | nindent 6 }}
-    {{- end }}
+      {{- toYaml $nsMeta | nindent 6 }}
