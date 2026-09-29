@@ -1,7 +1,7 @@
 # ArgoCD Application configuration
 argocd:
-  # Namespace where ArgoCD is installed (injected from .env: ARGOCD_NAMESPACE)
-  namespace: ""
+  # Namespace where ArgoCD is installed
+  namespace: openshift-gitops
 
   # Note: the infra repo must be registered with ArgoCD separately
   # (e.g. via "Connect Repo" in the ArgoCD UI/CLI) — this chart does not
@@ -69,7 +69,9 @@ argocd:
           maxDuration: 3m
 
       # Metadata applied to the auto-created destination namespace.
-      # The template always adds argocd.argoproj.io/managed-by=<argocd.namespace>
-      # so the label can't drift from the namespace ArgoCD runs in.
+      # The managed-by label grants the OpenShift GitOps controller RBAC to
+      # manage resources in the target namespace. The value MUST match the
+      # namespace where the GitOps instance / application-controller runs.
       managedNamespaceMetadata:
-        labels: {}
+        labels:
+          argocd.argoproj.io/managed-by: openshift-gitops
