@@ -1,0 +1,6 @@
+apiVersion: v2
+name: df-lob-argocd
+description: ArgoCD Application for DF-LOB
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
