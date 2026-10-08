@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "707353a"
+  tag: "a59a402"
 
 github:
   pullSecret:
@@ -42,6 +42,15 @@ route:
   host: ""  # Required for Pomerium ingress — e.g. df-lob.apps-crc.testing
 
 acmeIssuerName: "clusterissuer-primkey-acme"
+
+# Passthrough Route from the OpenShift router to Pomerium for route.host
+# (templates/pomerium-route.yaml). Set create=false on clusters where Pomerium
+# receives traffic directly (e.g. a LoadBalancer) rather than via the router.
+pomerium:
+  namespace: pomerium
+  service: pomerium-proxy
+  route:
+    create: true
 
 resources:
   limits:

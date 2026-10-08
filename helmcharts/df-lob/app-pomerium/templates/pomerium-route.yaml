@@ -1,0 +1,34 @@
+{{- /*
+OpenShift Route that hands the app's host to Pomerium.
+
+On OpenShift the default router owns ports 80/443, so an Ingress with
+ingressClassName: pomerium is only reachable once the router passes its host
+through to the pomerium-proxy service. Without this Route the router answers
+with its own "Application is not available" 503 page.
+
+The Route lives in Pomerium's namespace, not the app's, so ArgoCD (which only
+manages the app namespace) can't own it: with argocd=true it is skipped here
+and bin/lob.js pre-applies it with kubectl, like the SCC.
+*/ -}}
+{{- if and .Values.pomerium.route.create .Values.route.host (not .Values.argocd) }}
+{{- $host := .Values.route.host | replace ".apps." "." -}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pomerium-{{ include "df-lob.fullname" . }}
+  namespace: {{ .Values.pomerium.namespace }}
+  labels:
+    {{- include "df-lob.labels" . | nindent 4 }}
+spec:
+  host: {{ $host }}
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+  to:
+    kind: Service
+    name: {{ .Values.pomerium.service }}
+    weight: 100
+  wildcardPolicy: None
+{{- end }}
