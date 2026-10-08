@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "ce2325b"
+  tag: "eb7da6d"
 
 github:
   pullSecret:
@@ -44,13 +44,16 @@ route:
 acmeIssuerName: "clusterissuer-primkey-acme"
 
 # Passthrough Route from the OpenShift router to Pomerium for route.host
-# (templates/pomerium-route.yaml). Set create=false on clusters where Pomerium
-# receives traffic directly (e.g. a LoadBalancer) rather than via the router.
+# (templates/pomerium-route.yaml). Off by default: the Route claims the app
+# host on the OpenShift router, which blocks cert-manager's ACME HTTP-01
+# solver (HostAlreadyClaimed) so the TLS certificate never issues. Only
+# enable it on clusters where Pomerium has no ingress of its own and all
+# traffic must arrive via the OpenShift router.
 pomerium:
   namespace: pomerium
   service: pomerium-proxy
   route:
-    create: true
+    create: false
 
 resources:
   limits:
