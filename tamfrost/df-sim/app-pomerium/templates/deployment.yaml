@@ -41,6 +41,9 @@ spec:
         - name: http
           containerPort: {{ .Values.service.port }}
           protocol: TCP
+        - name: dfserver
+          containerPort: {{ .Values.service.dfServerPort }}
+          protocol: TCP
         {{- with .Values.env }}
         env:
         {{- toYaml . | nindent 8 }}
