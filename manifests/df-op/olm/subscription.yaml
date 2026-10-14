@@ -1,0 +1,14 @@
+# Installs df-op cluster-wide like the other OLM operators on minc
+# (openshift-operators / global-operators OperatorGroup), so it shows up
+# under Installed Operators in every project and upgrades automatically.
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: df-op
+  namespace: openshift-operators
+spec:
+  channel: alpha
+  name: df-op
+  source: df-op-catalog
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic

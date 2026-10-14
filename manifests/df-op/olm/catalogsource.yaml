@@ -1,0 +1,21 @@
+# Catalog holding the newest df-op bundle; the df-op workflow pushes :latest
+# on every build and OLM picks it up on the next poll.
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: df-op-catalog
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: ghcr.io/tamfrost/df-op-catalog:latest
+  displayName: DF Stack Operator
+  publisher: tamfrost
+  # ghcr packages are private: the catalog pod and the bundle unpack job pull
+  # with this secret, created by hand in openshift-marketplace (not in git).
+  secrets:
+  - ghcr
+  grpcPodConfig:
+    securityContextConfig: restricted
+  updateStrategy:
+    registryPoll:
+      interval: 10m

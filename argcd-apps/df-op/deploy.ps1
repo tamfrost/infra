@@ -3,12 +3,12 @@
 
 Write-Host "Deploying df-op via Argo CD..." -ForegroundColor Cyan
 
-# Images on ghcr.io are private: the operator and the apps pull with a
-# secret named "ghcr", created once per cluster (never kept in git), e.g.
-#   kubectl -n df-op-system create secret docker-registry ghcr --docker-server=ghcr.io `
+# Images on ghcr.io are private: OLM (catalog, bundle), the operator and the
+# apps pull with a secret named "ghcr", created once per cluster (never kept
+# in git) in each of these namespaces, e.g.
+#   kubectl -n openshift-marketplace create secret docker-registry ghcr --docker-server=ghcr.io `
 #     --docker-username=<user> --docker-password=<PAT with read:packages>
-# and the same in namespace df.
-foreach ($ns in "df-op-system", "df") {
+foreach ($ns in "openshift-marketplace", "openshift-operators", "df") {
     kubectl get secret ghcr -n $ns *> $null
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Missing pull secret 'ghcr' in namespace $ns (see comment above)" -ForegroundColor Yellow

@@ -1,5 +1,5 @@
-# df-op operator: CRD, RBAC and Deployment, rendered and pinned to the image
-# by the df-op workflow on every push.
+# df-op operator, installed through OLM: Argo CD keeps the CatalogSource and
+# Subscription in place, OLM installs and upgrades the operator from them.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -9,15 +9,12 @@ spec:
   project: default
   source:
     repoURL: https://github.com/tamfrost/infra
-    path: manifests/df-op/operator
+    path: manifests/df-op/olm
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
-    namespace: df-op-system
+    namespace: openshift-operators
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      # The CRD is ~190 KB, too close to the 256 KB last-applied annotation limit
-      - ServerSideApply=true
