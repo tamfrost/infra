@@ -10,7 +10,7 @@ metadata:
 spec:
   lob:
     image:
-      tag: latest
+      tag: "b20de87"
   sim:
     image:
       tag: "caafa87"
