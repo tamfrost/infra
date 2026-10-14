@@ -13,7 +13,7 @@ spec:
       tag: latest
   sim:
     image:
-      tag: latest
+      tag: "caafa87"
   fix:
     image:
       tag: latest
