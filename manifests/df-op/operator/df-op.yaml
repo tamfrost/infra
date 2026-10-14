@@ -2893,7 +2893,7 @@ spec:
       containers:
       - args:
         - --health-probe-bind-address=:8081
-        image: ghcr.io/tamfrost/df-op:9dd3edb
+        image: ghcr.io/tamfrost/df-op:5ad338c
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
