@@ -1,0 +1,29 @@
+# The DfStack: df-lob + df-sim. The app workflows bump the image tags in
+# manifests/df-op/stack/dfstack.yaml; the operator rolls them out.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: df-stack
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/tamfrost/infra
+    path: manifests/df-op/stack
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: df
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    # Retries until the df-op Application has installed the DfStack CRD
+    retry:
+      limit: 10
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
