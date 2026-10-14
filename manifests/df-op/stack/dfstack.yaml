@@ -1,4 +1,4 @@
-# Git holds only the image tags; the df-lob/df-sim/df-fix workflows bump them and
+# Git holds only the image tags; the app workflows bump them and
 # Argo CD syncs each commit (server-side apply, so nothing else is touched).
 # Every other setting is managed in the console: Installed Operators ->
 # DF Stack -> df. Keep the indentation: the workflows edit the tag: lines.
@@ -15,5 +15,8 @@ spec:
     image:
       tag: "caafa87"
   fix:
+    image:
+      tag: latest
+  proxy:
     image:
       tag: latest
