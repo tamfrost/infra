@@ -19,4 +19,4 @@ spec:
       tag: latest
   proxy:
     image:
-      tag: "54d2e4b"
+      tag: "ac2d77c"
