@@ -1,31 +1,16 @@
-# The DfStack that CI seeds into the infra repo (df-op/stack/dfstack.yaml)
-# the first time only. From then on the copy in infra is the one that counts:
-# the df-lob/df-sim workflows bump its image tags there, and Argo CD syncs it.
-#
-# Settings are for the minc dev cluster (<name>.localhost hosts, local CA,
-# Pomerium reached through the OpenShift router).
+# Git holds only the image tags; the df-lob/df-sim workflows bump them and
+# Argo CD syncs each commit (server-side apply, so nothing else is touched).
+# Every other setting is managed in the console: Installed Operators ->
+# DF Stack -> df. Keep the indentation: the workflows edit the tag: lines.
 apiVersion: df.jolundq.se/v1alpha1
 kind: DfStack
 metadata:
   name: df
   namespace: df
 spec:
-  # Create once per cluster; not kept in git:
-  #   kubectl -n df create secret docker-registry ghcr --docker-server=ghcr.io \
-  #     --docker-username=<user> --docker-password=<PAT with read:packages>
-  imagePullSecrets:
-  - name: ghcr
-  ingress:
-    domain: localhost
-    clusterIssuer: local-ca-issuer
-  openshift:
-    pomeriumRoute:
-      enabled: true
   lob:
     image:
-      repository: ghcr.io/tamfrost/df-lob
       tag: latest
   sim:
     image:
-      repository: ghcr.io/tamfrost/df-sim
       tag: latest

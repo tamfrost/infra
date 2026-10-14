@@ -1,5 +1,9 @@
-# The DfStack: df-lob + df-sim. The app workflows bump the image tags in
-# manifests/df-op/stack/dfstack.yaml; the operator rolls them out.
+# The DfStack: df-lob + df-sim. Git and the console share it:
+#   - git (manifests/df-op/stack/dfstack.yaml) holds only the image tags,
+#     which the df-lob/df-sim workflows bump; each new commit is synced.
+#   - everything else is edited in the console (Installed Operators -> DF Stack).
+# Server-side apply makes Argo CD touch only the fields in git, and selfHeal
+# is off so console edits aren't reverted between commits.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -17,10 +21,11 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
+      selfHeal: false
     syncOptions:
       - CreateNamespace=true
-    # Retries until the df-op Application has installed the DfStack CRD
+      - ServerSideApply=true
+    # Retries until the df-op operator (OLM) has installed the DfStack CRD
     retry:
       limit: 10
       backoff:
