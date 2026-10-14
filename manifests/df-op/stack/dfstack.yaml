@@ -7,6 +7,8 @@ kind: DfStack
 metadata:
   name: df
   namespace: df
+  annotations:
+    df.jolundq.se/sync-test: "1"
 spec:
   lob:
     image:
