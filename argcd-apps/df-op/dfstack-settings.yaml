@@ -1,0 +1,18 @@
+# Starting settings for the "df" DfStack on a minc cluster. deploy.ps1 applies
+# them once, when the stack is new; after that the console owns them
+# (Installed Operators -> DF Stack -> df) and re-running deploy.ps1 leaves
+# them alone. The image tags come from git (manifests/df-op/stack).
+apiVersion: df.jolundq.se/v1alpha1
+kind: DfStack
+metadata:
+  name: df
+  namespace: df
+spec:
+  # Created by deploy.ps1; df-lob and df-sim are private on ghcr.io
+  imagePullSecrets:
+  - name: ghcr
+  # <app>.localhost with a certificate from create-minc's local CA, served by
+  # Pomerium on https://<app>.localhost:9444
+  ingress:
+    domain: localhost
+    clusterIssuer: local-ca-issuer
