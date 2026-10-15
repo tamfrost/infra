@@ -1,17 +1,17 @@
 replicaCount: 1
 
 image:
-  repository: ""  # Required: must be set via --set image.repository=...
+  repository: quay.cloudstorm.fra/rigel/df-proxy/df-proxy-app  # can be overridden via --set image.repository=...
   pullPolicy: Always
-  tag: "ac2d77c"
+  tag: "f11f4b0"
 
 github:
   pullSecret:
     create: true
-    name: ghcr-secret
-    registry: ""  # Injected from .env
-    username: ""  # Injected from .env
-    token: ""  # Required: must be set via --set github.pullSecret.token=$GITHUB_TOKEN
+    name: quay-secret
+    registry: quay.cloudstorm.fra  # can be overridden via --set github.pullSecret.registry=...
+    username: rigel+rigel_image_robot  # can be overridden via --set github.pullSecret.username=...
+    token: ""  # Required: must be set via --set github.pullSecret.token=$REGISTRY_PASSWORD
 
 nameOverride: ""
 fullnameOverride: ""
