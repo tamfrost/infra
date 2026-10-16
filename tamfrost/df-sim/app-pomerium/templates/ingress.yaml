@@ -22,14 +22,6 @@ spec:
     - host: {{ $host }}
       http:
         paths:
-          # df-server stand-in listens on its own port; path is passed through as-is
-          - path: /dfserver
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "df-sim.fullname" . }}
-                port:
-                  number: {{ .Values.service.dfServerPort }}
           - path: /
             pathType: Prefix
             backend:

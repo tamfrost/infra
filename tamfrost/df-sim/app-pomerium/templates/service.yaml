@@ -11,9 +11,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.service.dfServerPort }}
-      targetPort: dfserver
-      protocol: TCP
-      name: dfserver
   selector:
     {{- include "df-sim.selectorLabels" . | nindent 4 }}
