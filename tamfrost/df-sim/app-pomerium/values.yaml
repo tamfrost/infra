@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "c96daa0"
+  tag: "07b75a5"
 
 github:
   pullSecret:
@@ -35,8 +35,8 @@ service:
   port: 8080
 
 # HTTP path used for startup / readiness probes.
-# The API serves a JSON health check at /api/v1/health.
-probePath: /api/v1/health
+# The API serves a JSON health check at /api/health (also /api/v1/health).
+probePath: /api/health
 
 route:
   host: ""  # Required for Pomerium ingress — e.g. df-sim.apps.rigel.app
