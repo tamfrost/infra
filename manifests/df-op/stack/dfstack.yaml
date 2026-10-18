@@ -10,7 +10,7 @@ metadata:
 spec:
   lob:
     image:
-      tag: "9601f5b"
+      tag: "544fa87"
   sim:
     image:
       tag: "c3031a2"
