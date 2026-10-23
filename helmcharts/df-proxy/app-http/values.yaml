@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: quay.cloudstorm.fra/rigel/df-proxy/df-proxy-app  # can be overridden via --set image.repository=...
   pullPolicy: Always
-  tag: "f11f4b0"
+  tag: "7ad9aef"
 
 github:
   pullSecret:
