@@ -16,7 +16,7 @@ spec:
       tag: "851de06"
   fix:
     image:
-      tag: "6902cfb"
+      tag: "59ea039"
   proxy:
     image:
       tag: "7ad9aef"
