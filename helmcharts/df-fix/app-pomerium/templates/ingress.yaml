@@ -8,7 +8,14 @@ metadata:
     {{- if and .Values.acmeIssuerName (ne .Values.acmeIssuerName "-") }}
     cert-manager.io/cluster-issuer: {{ .Values.acmeIssuerName }}
     {{- end }}
+    {{- if .Values.route.publicAccess }}
+    # Public: no Pomerium login. cors_allow_preflight lets the CORS preflight
+    # OPTIONS requests through (other origins fetch /api/v1/getFix).
+    ingress.pomerium.io/allow_public_unauthenticated_access: "true"
+    ingress.pomerium.io/cors_allow_preflight: "true"
+    {{- else }}
     ingress.pomerium.io/allow_any_authenticated_user: "true"
+    {{- end }}
     ingress.pomerium.io/pass_identity_headers: "true"
 spec:
   ingressClassName: pomerium

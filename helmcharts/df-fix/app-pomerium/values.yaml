@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ""  # Required: must be set via --set image.repository=...
   pullPolicy: Always
-  tag: "e8489a7"
+  tag: "c612df9"
 
 github:
   pullSecret:
@@ -40,6 +40,11 @@ probePath: /api/v1/ping
 
 route:
   host: ""  # Required for Pomerium ingress — e.g. df-fix.apps-crc.testing
+
+  # false (default): any authenticated Pomerium user may access the app.
+  # true: publicly reachable without login (allow_public_unauthenticated_access
+  # + cors_allow_preflight annotations on the ingress).
+  publicAccess: false
 
 acmeIssuerName: "clusterissuer-primkey-acme"
 
