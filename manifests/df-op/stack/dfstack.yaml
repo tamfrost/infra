@@ -13,7 +13,7 @@ spec:
       tag: "b5b0987"
   sim:
     image:
-      tag: "fba86d1"
+      tag: "82e0470"
   fix:
     image:
       tag: "c612df9"
