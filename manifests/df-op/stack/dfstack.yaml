@@ -13,7 +13,7 @@ spec:
       tag: "cf74043"
   sim:
     image:
-      tag: "8610288"
+      tag: "4851e5c"
   fix:
     image:
       tag: "c612df9"
