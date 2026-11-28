@@ -19,4 +19,4 @@ spec:
       tag: "c612df9"
   proxy:
     image:
-      tag: "746aad2"
+      tag: "565c375"
